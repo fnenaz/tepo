@@ -1,0 +1,879 @@
+{
+  "info": {
+    "_postman_id": "tepo-clinical-api-v1",
+    "name": "TEPO (Teman Bipolar) - API Testing Collection",
+    "description": "Koleksi pengujian REST API TEPO menggunakan Postman: Autentikasi (Bearer Token & Session Cookie), Pencatatan Multi-Mood (-3 s/d +3) & Energi (1-5), Jam Tidur, Multi-Resep Obat, Laporan Klinis 2 Minggu, Konsultasi Anonim Dua Arah (DEMO), dan Manajemen Rekomendasi Admin.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mood_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "prescription_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "medication_log_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "consultation_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "recommendation_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Autentikasi",
+      "item": [
+        {
+          "name": "Register Akun Pasien Baru",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status code adalah 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pasien Uji Postman\",\n  \"email\": \"uji.postman{{$timestamp}}@tepo.test\",\n  \"phone\": \"081234567899\",\n  \"role\": \"patient\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login Pasien",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Login Pasien berhasil (200 OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pasien@tepo.test\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Mahasiswa Psikologi (DEMO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Login Mahasiswa Psikologi berhasil (200 OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"konselor1@tepo.test\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Login Admin berhasil (200 OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tepo.test\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Profil User Aktif (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout berhasil (200 OK)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.collectionVariables.set('token', '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Multi-Mood & Energi (-3 s/d +3)",
+      "item": [
+        {
+          "name": "Ambil Dashboard Pasien",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patient/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Catat Mood Pagi (Manik +3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Mood Pagi berhasil dicatat (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('mood_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period\": \"Pagi\",\n  \"entry_time\": \"08:15\",\n  \"mood_level\": 3,\n  \"energy_level\": 5,\n  \"daily_notes\": \"Banyak bicara, muncul banyak ide tugas sekaligus, ingin belanja impulsif\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/patient/mood",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "mood"]
+            }
+          }
+        },
+        {
+          "name": "Catat Mood Sore (Depresi -2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Mood Sore berhasil dicatat di hari yang sama (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('mood_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period\": \"Sore\",\n  \"entry_time\": \"16:40\",\n  \"mood_level\": -2,\n  \"energy_level\": 1,\n  \"daily_notes\": \"Energi turun drastis di sore hari, ingat penyesalan mendalam\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/patient/mood",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "mood"]
+            }
+          }
+        },
+        {
+          "name": "Hapus Entri Mood",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patient/mood/{{mood_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "mood", "{{mood_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Siklus Jam Tidur",
+      "item": [
+        {
+          "name": "Simpan Jam Tidur Harian",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sleep_start\": \"23:30\",\n  \"sleep_end\": \"07:00\",\n  \"duration_hours\": 7.5,\n  \"quality\": 4,\n  \"notes\": \"Tidur cukup nyenyak tanpa terbangun tengah malam\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/patient/sleep",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "sleep"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Multi-Resep & Log Obat",
+      "item": [
+        {
+          "name": "Lihat Daftar Resep Obat Aktif",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patient/prescriptions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "prescriptions"]
+            }
+          }
+        },
+        {
+          "name": "Tambah Resep Obat Baru",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Resep obat baru berhasil dibuat (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('prescription_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medication_name\": \"Valproate ER\",\n  \"dosage\": \"250 mg\",\n  \"frequency\": \"2x1 sehari (08:00 Pagi & 20:00 Malam)\",\n  \"prescribing_doctor\": \"dr. Hendra Wijaya, Sp.KJ\",\n  \"instructions\": \"Diminum utuh sesudah makan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/patient/prescriptions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "prescriptions"]
+            }
+          }
+        },
+        {
+          "name": "Catat Konsumsi Obat Dari Resep",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Log obat dari resep berhasil disimpan (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('medication_log_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prescription_id\": {{prescription_id}},\n  \"quantity_taken\": 1,\n  \"scheduled_time\": \"08:00\",\n  \"status\": \"on_time\",\n  \"notes\": \"Diminum tepat waktu sesudah sarapan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/patient/medication",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "medication"]
+            }
+          }
+        },
+        {
+          "name": "Catat Konsumsi Obat Manual (Jenis Kedua)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Log obat kedua berhasil disimpan (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('medication_log_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medication_name\": \"Olanzapine\",\n  \"dosage\": \"5 mg\",\n  \"prescription_rule\": \"1x1 malam hari bila sulit tidur\",\n  \"quantity_taken\": 1,\n  \"scheduled_time\": \"21:30\",\n  \"status\": \"on_time\",\n  \"notes\": \"Diminum sebelum tidur\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/patient/medication",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "medication"]
+            }
+          }
+        },
+        {
+          "name": "Hapus Log Obat",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patient/medication/{{medication_log_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "medication", "{{medication_log_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Hapus Resep Obat",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patient/prescriptions/{{prescription_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "prescriptions", "{{prescription_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Laporan Klinis 2 Minggu",
+      "item": [
+        {
+          "name": "Ambil Laporan & Evaluasi 14 Hari",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patient/reports?days=14",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patient", "reports"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "14"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Konsultasi Anonim Dua Arah (DEMO)",
+      "item": [
+        {
+          "name": "Lihat Daftar Konsultasi Anonim",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/consultations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "consultations"]
+            }
+          }
+        },
+        {
+          "name": "Mulai Sesi Konsultasi Anonim Baru (Pasien)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Sesi konsultasi anonim berhasil dibuat (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('consultation_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Pagi ini saya merasa sangat bertenaga dan sulit tidur, ingin bercerita secara anonim\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/consultations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "consultations"]
+            }
+          }
+        },
+        {
+          "name": "Lihat Detail & Pesan Ruang Obrolan Anonim",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const text = pm.response.text();",
+                  "pm.test('Tidak membocorkan email atau kata sandi lawan bicara', function () {",
+                  "    pm.expect(text).to.not.include('@tepo.test');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/consultations/{{consultation_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "consultations", "{{consultation_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Kirim Pesan Obrolan Anonim",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Saya khawatir kalau bercerita terbuka identitas saya ketahuan, lega rasanya bisa berbicara anonim di sini.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/consultations/{{consultation_id}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "consultations", "{{consultation_id}}", "messages"]
+            }
+          }
+        },
+        {
+          "name": "Ubah Status Sesi Konsultasi",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/consultations/{{consultation_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "consultations", "{{consultation_id}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Admin Rekomendasi Koping",
+      "item": [
+        {
+          "name": "Lihat Daftar Rekomendasi Koping",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "recommendations"]
+            }
+          }
+        },
+        {
+          "name": "Tambah Rekomendasi Koping Baru",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Rekomendasi koping berhasil ditambah (201 Created)', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('recommendation_id', String(res.data.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phase\": \"manic\",\n  \"type\": \"activity\",\n  \"title\": \"Latihan Grounding 5-4-3-2-1\",\n  \"description\": \"Fokus menyebutkan 5 benda yang dilihat, 4 yang disentuh, 3 yang didengar untuk menurunkan stimulasi berlebih.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "recommendations"]
+            }
+          }
+        },
+        {
+          "name": "Hapus Rekomendasi Koping",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/recommendations/{{recommendation_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "recommendations", "{{recommendation_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
